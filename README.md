@@ -8,9 +8,9 @@
 
 ## 🎬 Demo
 
-[![Watch the demo](https://img.youtube.com/vi/VIDEO_ID/0.jpg)](https://raw.githubusercontent.com/tomasnp/rl-LunarLander/main/assets/video/visual_evaluation.mp4)
+[![Watch the demo](assets/images/lunarlander-demo-thumbnail.png)](https://github.com/tomasnp/rl-LunarLander/blob/main/assets/video/visual_evaluation.mp4)
 
-*Average score: **247 ± 18** over 100 evaluation episodes. Success rate: **91%**.*
+*Average score: 247 ± 18 over 100 evaluation episodes. Success rate: 91%.*
 
 ---
 

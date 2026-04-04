@@ -8,6 +8,8 @@
 
 ## Demo
 
+https://github.com/tomasnp/rl-LunarLander/blob/main/assets/video/visual_evaluation.mp4
+
 > Click the thumbnail below to watch the trained A2C agent land autonomously.
 
 [![LunarLander Demo](https://img.youtube.com/vi/XXXXXXXX/maxresdefault.jpg)](https://www.youtube.com/watch?v=XXXXXXXX)

@@ -1,29 +1,37 @@
 # Deep Reinforcement Learning on LunarLander-v3
 
-**Implementing and comparing REINFORCE, A2C, and DQN on a continuous-state control task.**
+**Implementing and benchmarking REINFORCE, A2C, and DQN on a continuous-state control task.**
 
 *Amine Rouibi · Thomas Sinapi — Master IASD, Paris-Dauphine / PSL*
 
 ---
 
+This project demonstrates:
+- Clean from-scratch implementation of three RL families: Monte-Carlo policy gradient, actor-critic, and value-based
+- Controlled experimental comparison across stability, sample efficiency, and final performance
+- Analysis of variance reduction techniques (GAE, baselines, entropy regularisation) and their practical impact
+
+---
+
 ## 🎬 Demo
 
-[![Watch the demo](assets/images/lunarlander-demo-thumbnail.png)](https://github.com/tomasnp/rl-LunarLander/blob/main/assets/video/visual_evaluation.mp4)
+![LunarLander Demo](assets/images/demo.gif)
 
-*Average score: 247 ± 18 over 100 evaluation episodes. Success rate: 91%.*
+▶️ Full evaluation video:
+https://raw.githubusercontent.com/tomasnp/rl-LunarLander/main/assets/video/visual_evaluation.mp4
+
+*Best agent (A2C): 247 ± 18 over 100 evaluation episodes — 91% success rate.*
 
 ---
 
 ## Problem
 
-[LunarLander-v3](https://gymnasium.farama.org/environments/box2d/lunar_lander/) is a discrete-action control task with an 8-dimensional continuous observation space (position, velocity, angle, angular velocity, leg contacts) and 4 actions (do nothing, left thruster, main engine, right thruster).
+[LunarLander-v3](https://gymnasium.farama.org/environments/box2d/lunar_lander/) is a discrete-action control task with an 8-dimensional continuous observation space (position, velocity, angle, angular velocity, leg contacts) and 4 actions. The episode is solved when the agent scores ≥ 200.
 
-The reward function penalises fuel use, rewards proximity to the landing pad, and gives ±100 for a successful landing or crash. **An episode is considered solved when the agent scores ≥ 200.**
-
-The environment is a meaningful benchmark for policy-gradient methods:
-- Episodes have variable length and dense rewards — ideal for Monte-Carlo estimates.
-- The observation space is continuous — eliminates tabular Q-learning.
-- Safe landing requires coordinated multi-step decisions — tests credit assignment.
+It is a meaningful benchmark for policy-gradient methods because:
+- Dense rewards with variable episode length — well-suited for Monte-Carlo estimates
+- Continuous observation space — eliminates tabular approaches
+- Multi-step credit assignment required — tests the quality of advantage estimation
 
 ---
 
@@ -31,43 +39,42 @@ The environment is a meaningful benchmark for policy-gradient methods:
 
 ### REINFORCE + Baseline
 
-Classic Monte-Carlo policy gradient. The policy is updated at the end of each episode using the discounted return G_t as the learning signal. A learned value baseline V(s) is subtracted to form the advantage Â_t = G_t − V(s_t), which reduces gradient variance without introducing bias.
+Classic Monte-Carlo policy gradient. The policy updates at episode end using discounted return G_t. A learned value baseline V(s) forms the advantage Â_t = G_t − V(s_t), reducing gradient variance without adding bias.
 
 **Key choices:**
-- Gradient accumulation over 4 episodes per update — smooths the noisy MC signal.
-- Entropy regularisation with exponential decay — transitions from exploration to exploitation.
-- Advantage normalisation per batch — prevents large early returns from destabilising training.
+- Gradient accumulation over 4 episodes per update — smooths the noisy MC signal
+- Entropy regularisation with exponential decay — structured exploration-to-exploitation transition
+- Advantage normalisation per batch — prevents large early returns from destabilising training
 
 ### A2C + GAE
 
-Synchronous Advantage Actor-Critic with Generalized Advantage Estimation. Instead of full episodes, A2C collects fixed-length rollouts (2 048 steps) and updates immediately, decoupling update frequency from episode length.
+Synchronous Advantage Actor-Critic with Generalized Advantage Estimation. A2C collects fixed-length rollouts (2 048 steps) and updates immediately, decoupling update frequency from episode length.
 
-**GAE interpolates between TD(0) and Monte-Carlo** via the λ parameter:
+GAE interpolates between TD(0) and Monte-Carlo via the λ parameter:
 
 ```
-δ_t   = r_t + γ · V(s_{t+1}) · (1 − done_t) − V(s_t)   ← TD error
-Â_t   = Σ_{l≥0} (γλ)^l · δ_{t+l}                       ← GAE (λ=0.95)
+δ_t = r_t + γ · V(s_{t+1}) · (1 − done_t) − V(s_t)   ← TD error
+Â_t = Σ_{l≥0} (γλ)^l · δ_{t+l}                       ← GAE (λ=0.95)
 ```
 
-With λ=0.95, advantages are stable and low-bias — the key reason A2C converges faster and more reliably than REINFORCE on this task.
+With λ=0.95, advantage estimates are low-variance and low-bias — the primary reason A2C converges faster and more reliably than REINFORCE.
 
 **Key choices:**
-- Linear entropy decay (0.05 → 0.005) — coarser schedule than REINFORCE's multiplicative one.
-- SmoothL1 critic loss — less sensitive to outlier returns than MSE.
-- Correctly distinguishes *terminated* from *truncated* episodes when bootstrapping V(s_{T+1}).
+- Linear entropy decay (0.05 → 0.005)
+- SmoothL1 critic loss — more robust to outlier returns than MSE
+- Correctly distinguishes *terminated* from *truncated* episodes when bootstrapping V(s_T)
 
 ### DQN
 
-Off-policy value-based method. Instead of optimising the policy directly, DQN learns a Q-function Q(s,a) via the Bellman equation and derives an implicit greedy policy.
+Off-policy value-based method. DQN learns Q(s,a) via the Bellman equation and derives an implicit greedy policy, rather than optimising the policy directly.
 
 **Two stabilisation mechanisms:**
-1. **Experience replay** — random mini-batch sampling from a 10 000-transition circular buffer breaks temporal correlations.
-2. **Target network** — a periodically-synced copy of Q is used to compute Bellman targets, preventing the moving-target instability.
+1. **Experience replay** — random mini-batch sampling from a 10 000-transition buffer breaks temporal correlations
+2. **Target network** — a periodically-synced copy of Q stabilises Bellman targets
 
 **Key choices:**
-- ε-greedy with multiplicative decay (1.0 → 0.01) — simpler exploration than entropy regularisation.
-- MSE loss on Q-values — standard Bellman regression objective.
-- Hard target update every 10 episodes.
+- ε-greedy with multiplicative decay (1.0 → 0.01)
+- Hard target update every 10 episodes
 
 ---
 
@@ -80,13 +87,13 @@ Off-policy value-based method. Instead of optimising the policy directly, DQN le
 | Hardware | Apple M-series / NVIDIA GPU |
 | Framework | PyTorch 2.1 |
 
-**Architecture** — all networks use two hidden layers:
+**Network architecture** — two hidden layers across all agents:
 
-| Algorithm | Actor hidden | Critic hidden | Activation |
+| Algorithm | Actor | Critic / Q-net | Activation |
 |---|---|---|---|
 | REINFORCE | 256 | 256 | LayerNorm + ReLU |
 | A2C | 256 | 256 | Tanh |
-| DQN | — | 128 (Q-net) | ReLU |
+| DQN | — | 128 | ReLU |
 
 ---
 
@@ -103,28 +110,21 @@ Off-policy value-based method. Instead of optimising the policy directly, DQN le
 | Algorithm | Mean Score | Std | Success Rate | Episodes to Solve |
 |---|---|---|---|---|
 | REINFORCE + Baseline | 198 ± 52 | 52 | 68% | ~6 000 |
-| A2C + GAE | **247 ± 18** | 18 | **91%** | ~1 200 updates (≈2.5M steps) |
+| A2C + GAE | **247 ± 18** | **18** | **91%** | ~1 200 updates (≈2.5M steps) |
 | DQN | 231 ± 31 | 31 | 83% | ~1 500 episodes |
 
 *"Solved" = rolling mean ≥ 200 over 100 episodes.*
 
+**A2C achieves the highest score, lowest variance, and best success rate.** GAE's bias-variance trade-off directly translates to more stable convergence compared to both REINFORCE's high-variance MC estimates and DQN's sensitivity to exploration scheduling.
+
 ---
 
-## Key Insights
+## Key Takeaways
 
-**Why A2C outperforms REINFORCE**
-
-REINFORCE suffers from high variance because the advantage estimate G_t is a single Monte-Carlo sample over an entire episode. GAE in A2C replaces this with a multi-step TD estimate that trades a small amount of bias for a large reduction in variance. The result is a much smoother loss landscape and faster convergence.
-
-Additionally, rollout-based updates (every 2 048 steps) are more frequent than episode-based updates, giving the critic more gradient steps early in training — which in turn produces better advantage estimates.
-
-**Why DQN is more sample-efficient but less stable**
-
-Experience replay allows DQN to reuse every transition multiple times, which is why it solves the task in fewer episodes than REINFORCE. However, the ε-greedy exploration schedule is less adaptive than entropy regularisation: if ε decays too fast, the agent can get stuck in a local optimum before discovering an optimal landing strategy.
-
-**REINFORCE's main limitation**
-
-High-variance gradient estimates require aggressive entropy regularisation to maintain exploration, which slows down convergence. The batch accumulation trick mitigates this but does not eliminate the fundamental Monte-Carlo variance problem.
+- **Variance reduction is the bottleneck in policy gradients.** GAE's multi-step TD estimates outperform full Monte-Carlo returns; the gap is visible in both convergence speed and final stability.
+- **Update frequency matters as much as update quality.** A2C's rollout-based updates give the critic more gradient steps early in training, accelerating advantage estimation quality.
+- **Off-policy reuse helps sample efficiency, not stability.** DQN solves the task in fewer *episodes* than REINFORCE, but ε-greedy exploration is less adaptive — premature decay can trap the agent in suboptimal policies.
+- **Entropy regularisation is essential for on-policy methods.** Without it, REINFORCE collapses to a narrow policy before the critic is reliable enough to guide exploitation.
 
 ---
 
@@ -137,13 +137,13 @@ rl-LunarLander/
 │
 ├── src/
 │   ├── reinforce/
-│   │   └── train.py         # REINFORCE + Baseline algorithm
+│   │   └── train.py
 │   ├── a2c/
-│   │   └── train.py         # A2C + GAE algorithm
+│   │   └── train.py
 │   ├── dqn/
-│   │   └── train.py         # DQN algorithm
+│   │   └── train.py
 │   └── utils/
-│       ├── common.py        # Seeding, device, env helpers, plot
+│       ├── common.py        # Seeding, device, env helpers, plotting
 │       └── logging.py       # TeeLogger, setup_logging
 │
 ├── configs/
@@ -153,8 +153,8 @@ rl-LunarLander/
 │
 ├── models/                  # Saved checkpoints (.pt / .pth)
 ├── experiments/
-│   ├── logs/                # Training logs (timestamped .log)
-│   └── metrics/             # DQN CSV metrics per run
+│   ├── logs/                # Timestamped training logs
+│   └── metrics/             # Per-run CSV metrics (DQN)
 ├── assets/
 │   ├── plots/               # Training curve PNGs
 │   └── video/               # Evaluation recordings
@@ -166,44 +166,33 @@ rl-LunarLander/
 
 ## How to Run
 
-**Install dependencies**
-
 ```bash
 pip install -r requirements.txt
 ```
 
-**Train**
-
 ```bash
+# Train
 python run.py train reinforce
 python run.py train a2c
 python run.py train dqn
-```
 
-**Evaluate a saved checkpoint**
+# Evaluate a checkpoint
+python run.py eval a2c --checkpoint models/a2c_best.pt
 
-```bash
-python run.py eval reinforce --checkpoint models/reinforce_best.pt
-python run.py eval a2c       --checkpoint models/a2c_best.pt
-python run.py eval dqn       --checkpoint models/dqn_best.pth --episodes 100
-```
-
-**Watch the agent play**
-
-```bash
+# Watch the agent
 python run.py play a2c --checkpoint models/a2c_best.pt
 ```
 
-All output (logs, checkpoints, plots) is organised automatically under `experiments/`, `models/`, and `assets/`.
+All outputs (logs, checkpoints, plots) are organised automatically under `experiments/`, `models/`, and `assets/`.
 
 ---
 
 ## Future Directions
 
-- **PPO** — adds a clipping objective to A2C for more stable large-batch updates
-- **Double DQN / Dueling DQN** — reduce Q-value overestimation and improve policy extraction
-- **Prioritised experience replay** — sample transitions proportional to their TD error
-- **Hyperparameter sweep** — systematic Bayesian search over learning rates, network sizes, GAE λ
+- **PPO** — clips the policy gradient objective for more stable large-batch updates
+- **Double DQN / Dueling DQN** — reduces Q-value overestimation
+- **Prioritised experience replay** — samples transitions proportional to TD error
+- **Hyperparameter sweep** — systematic Bayesian search over learning rates, GAE λ, network sizes
 
 ---
 

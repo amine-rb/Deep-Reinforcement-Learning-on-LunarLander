@@ -1,5 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.Python
+*.egg-info/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Jupyter
 *.ipynb
-2.DQN/logs/json/*
-2.DQN/logs/csv/*
-*.DS_Store
-*.tex
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Large binary artifacts (keep checkpoints but ignore intermediate ones)
+experiments/metrics/json/
+*.INTERRUPTED.pth
+
+# IDE
+.vscode/
+.idea/
+
+# LaTeX intermediates
+*.aux
+*.tex.bak

@@ -1,0 +1,43 @@
+# REINFORCE with Baseline — Hyperparameters
+# ==========================================
+# Run: python run.py train reinforce
+
+algorithm: reinforce
+
+environment:
+  env_id: LunarLander-v3
+  seed: 42
+
+network:
+  hidden_size: 256       # Hidden layer width for both actor and critic
+
+learning:
+  gamma: 0.99            # Discount factor
+  lr_policy: 1.0e-4      # Actor learning rate
+  lr_value:  5.0e-4      # Critic (baseline) learning rate
+  value_coef: 0.5        # Critic loss weight in the joint update
+  grad_clip: 0.5         # Max gradient norm (joint actor + critic)
+  batch_episodes: 4      # Accumulate gradients over N episodes before update
+
+exploration:
+  entropy_coef: 0.01     # Initial entropy bonus coefficient
+  entropy_coef_decay: 0.995
+  entropy_coef_min: 0.001
+
+training:
+  max_episodes: 10000
+  eval_every: 50         # Evaluate every N training episodes
+  eval_episodes: 10      # Episodes per deterministic evaluation
+  solved_mean_reward: 200.0
+  solved_window: 100     # Rolling window for early-stop check
+
+output:
+  save_dir: models
+  save_name: reinforce_best.pt
+  plot_dir: assets/plots
+  log_dir: experiments/logs
+
+rendering:
+  render_eval_human: false
+  record_video: false
+  video_dir: assets/video/reinforce

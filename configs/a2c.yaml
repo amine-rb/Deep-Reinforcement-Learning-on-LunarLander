@@ -1,0 +1,49 @@
+# A2C with GAE — Hyperparameters
+# ================================
+# Run: python run.py train a2c
+
+algorithm: a2c
+
+environment:
+  env_id: LunarLander-v3
+  seed: 42
+
+network:
+  hidden_size: 256       # Hidden layer width for both actor and critic
+
+learning:
+  gamma: 0.99            # Discount factor
+  gae_lambda: 0.95       # GAE λ: 0=TD(0), 1=Monte-Carlo; 0.95 balances bias/variance
+  lr_policy: 5.0e-4      # Actor learning rate (AdamW)
+  lr_value:  1.0e-3      # Critic learning rate (AdamW)
+  value_coef: 0.5        # Critic loss weight
+  grad_clip: 0.5         # Max gradient norm
+  weight_decay: 0.0      # L2 regularisation in AdamW
+
+exploration:
+  entropy_coef_start: 0.05   # Initial entropy bonus (encourages exploration)
+  entropy_coef_final: 0.005  # Final value after linear decay
+
+training:
+  rollout_steps: 2048    # Steps collected per rollout (one update cycle)
+  max_updates: 10000     # Total rollout-update iterations
+  eval_every: 50         # Evaluate every N updates
+  eval_episodes: 30      # Episodes per deterministic evaluation
+  solved_mean_reward: 200.0
+  solved_window: 100
+
+stability:
+  normalize_obs: false   # Enable online Welford observation normalisation
+  obs_clip: 10.0         # Clip normalised obs to [-obs_clip, obs_clip]
+  reward_clip: null      # Clip rewards (null = disabled)
+
+output:
+  save_dir: models
+  save_name: a2c_best.pt
+  plot_dir: assets/plots
+  log_dir: experiments/logs
+
+rendering:
+  render_eval_human: false
+  record_video: false
+  video_dir: assets/video/a2c

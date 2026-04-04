@@ -1,0 +1,42 @@
+# DQN — Hyperparameters
+# =======================
+# Run: python run.py train dqn
+
+algorithm: dqn
+
+environment:
+  env_id: LunarLander-v3
+  seed: 42
+
+network:
+  hidden_size: 128       # Q-network hidden layer width
+
+learning:
+  gamma: 0.99            # Discount factor
+  learning_rate: 1.0e-3  # Adam learning rate for the Q-network
+
+exploration:
+  epsilon_start: 1.0     # Start fully random
+  epsilon_min: 0.01      # Minimum exploration probability
+  epsilon_decay: 0.995   # Multiplicative decay applied after each replay step
+
+replay:
+  batch_size: 64         # Mini-batch size sampled from replay buffer
+  memory_size: 10000     # Replay buffer capacity (circular)
+
+target_network:
+  target_update_freq: 10 # Copy online → target every N episodes
+
+training:
+  n_episodes: 2000
+  max_steps: 1000        # Safety cap per episode
+  log_every: 50          # Print progress every N episodes
+
+output:
+  save_dir: models
+  save_name: dqn_best.pth
+  log_dir: experiments/metrics
+  plot_dir: assets/plots
+
+rendering:
+  render_eval_human: false

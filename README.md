@@ -6,13 +6,12 @@
 
 ---
 
-## Demo
+## 🎬 Demo
 
-https://github.com/tomasnp/rl-LunarLander/blob/main/assets/video/visual_evaluation.mp4
+![Preview](assets/demo.gif)
 
-> Click the thumbnail below to watch the trained A2C agent land autonomously.
-
-[![LunarLander Demo](https://img.youtube.com/vi/XXXXXXXX/maxresdefault.jpg)](https://www.youtube.com/watch?v=XXXXXXXX)
+▶️ Full video:
+https://raw.githubusercontent.com/tomasnp/rl-LunarLander/main/assets/video/visual_evaluation.mp4
 
 *Average score: **247 ± 18** over 100 evaluation episodes. Success rate: **91%**.*
 

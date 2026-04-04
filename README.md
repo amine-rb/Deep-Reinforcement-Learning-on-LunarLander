@@ -105,9 +105,20 @@ Off-policy value-based method. DQN learns Q(s,a) via the Bellman equation and de
 
 ### Training curves
 
-| REINFORCE | A2C | DQN |
-|---|---|---|
-| ![reinforce](assets/plots/reinforce_training.png) | ![a2c](assets/plots/a2c_training.png) | ![dqn](assets/plots/dqn_training.png) |
+<h3>Training curves</h3>
+
+<div align="center">
+
+<b>REINFORCE</b><br/>
+<img src="assets/plots/reinforce_training.png" width="600"/><br/><br/>
+
+<b>A2C</b><br/>
+<img src="assets/plots/a2c_training.png" width="600"/><br/><br/>
+
+<b>DQN</b><br/>
+<img src="assets/plots/dqn_training.png" width="600"/>
+
+</div>
 
 ### Final evaluation (100 deterministic episodes)
 

@@ -24,8 +24,8 @@ Full evaluation video
 
 <br/><br/>
 <i>Best agent (A2C): 247 ± 18 over 100 evaluation episodes — 91% success rate.</i>
-
 </div>
+
 ---
 
 ## Problem

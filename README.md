@@ -103,8 +103,6 @@ Off-policy value-based method. DQN learns Q(s,a) via the Bellman equation and de
 
 ## Results
 
-### Training curves
-
 <h3>Training curves</h3>
 
 <div align="center">

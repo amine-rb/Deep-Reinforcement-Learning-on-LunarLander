@@ -13,15 +13,23 @@ This project demonstrates:
 
 ---
 
+<div align="center">
+
 ## 🎬 Demo
 
-![LunarLander Demo](assets/images/demo.gif)
+<img src="assets/images/demo.gif" width="600"/>
 
-▶️ Full evaluation video:
-https://raw.githubusercontent.com/tomasnp/rl-LunarLander/main/assets/video/visual_evaluation.mp4
+<br/>
 
-*Best agent (A2C): 247 ± 18 over 100 evaluation episodes — 91% success rate.*
+▶️ <a href="https://raw.githubusercontent.com/tomasnp/rl-LunarLander/main/assets/video/visual_evaluation.mp4">
+Full evaluation video
+</a>
 
+<br/><br/>
+
+<i>Best agent (A2C): 247 ± 18 over 100 evaluation episodes — 91% success rate.</i>
+
+</div>
 ---
 
 ## Problem

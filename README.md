@@ -215,3 +215,12 @@ All outputs (logs, checkpoints, plots) are organised automatically under `experi
 - Mnih et al., *Human-level control through deep reinforcement learning*, Nature 2015
 - Schulman et al., *High-Dimensional Continuous Control Using Generalized Advantage Estimation*, ICLR 2016
 - Mnih et al., *Asynchronous Methods for Deep Reinforcement Learning*, ICML 2016
+
+---
+
+## Credits
+
+Project developed as part of **Reinforcement Learning course** by : 
+- Thomas Sinapi : thomas.sinapi@dauphine.eu 
+- Amine ROUIBI : mohamed-el-amine.rouibi@dauphine.eu
+
